@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -21,14 +20,17 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 	ShapeRenderer shapeRenderer;
 
 	SpriteBatch batch;
-	TextureAtlas scienceAtlas;
-	SymbolSet scienceSet;
+	TextureAtlas spaceAtlas;
+	SymbolSet spaceSet;
 	Deck gameDeck;
 	Card cardL, cardR;
 	Sprite[] spritesL, spritesR;
+	Symbol[] symbolsL, symbolsR;
 
 	int symbolsPerCard;
 	float cardRadius, symbolSize;
+
+	boolean isCorrect;
 
 	@Override
 	public void create () {
@@ -39,8 +41,8 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 		shapeRenderer = new ShapeRenderer();
 
 		batch = new SpriteBatch();
-		scienceAtlas = new TextureAtlas("SpaceIcons.atlas");
-		int atlasLength = scienceAtlas.getRegions().size;
+		spaceAtlas = new TextureAtlas("SpaceIcons.atlas");
+		int atlasLength = spaceAtlas.getRegions().size;
 
 		String[] names = new String[atlasLength];
 		Color[] colors = new Color[atlasLength];
@@ -48,16 +50,17 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 			names[i] = String.format("(%d)", i + 1);
 			colors[i] = Color.CLEAR;
 		}
-		scienceSet = new SymbolSet("Science Pack", names, colors);
-		gameDeck = new Deck(scienceSet, symbolsPerCard = 6);
+		spaceSet = new SymbolSet("Science Pack", names, colors);
+		gameDeck = new Deck(spaceSet, symbolsPerCard = 6);
 
 		cardRadius = camera.viewportHeight / 4f;
 		symbolSize = cardRadius * 2f / symbolsPerCard;
 
+		isCorrect = false;
+
 		System.out.println(gameDeck.toFormattedString());
 		cardL = gameDeck.pickCard();
 		cardR = gameDeck.pickCard();
-
 	}
 
 	@Override
@@ -78,11 +81,11 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 		shapeRenderer.circle(circleR.x, circleR.y, circleR.radius - 2f);
 		shapeRenderer.end();
 
-		Symbol[] symbolsL = cardL.getSymbols();
+		symbolsL = cardL.getSymbols();
 		spritesL = new Sprite[symbolsL.length];
 		float angleL = 0f;
 		for (int i = 0; i < symbolsL.length; i++) {
-			spritesL[i] = scienceAtlas.createSprite(symbolsL[i].getName());
+			spritesL[i] = spaceAtlas.createSprite(symbolsL[i].getName());
 			spritesL[i].setSize(symbolSize, symbolSize);
 			spritesL[i].setCenter(
 					circleL.x + circleL.radius / 2f * MathUtils.cosDeg(angleL),
@@ -90,11 +93,11 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 			);
 			angleL += 360f / (float) symbolsL.length;
 		}
-		Symbol[] symbolsR = cardR.getSymbols();
+		symbolsR = cardR.getSymbols();
 		spritesR = new Sprite[symbolsR.length];
 		float angleR = 0f;
 		for (int i = 0; i < symbolsR.length; i++) {
-			spritesR[i] = scienceAtlas.createSprite(symbolsR[i].getName());
+			spritesR[i] = spaceAtlas.createSprite(symbolsR[i].getName());
 			spritesR[i].setSize(symbolSize, symbolSize);
 			spritesR[i].setCenter(
 					circleR.x + circleR.radius / 2f * MathUtils.cosDeg(angleR),
@@ -119,7 +122,7 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 	public void dispose () {
 		shapeRenderer.dispose();
 		batch.dispose();
-		scienceAtlas.dispose();
+		spaceAtlas.dispose();
 	}
 
 	@Override
@@ -154,14 +157,27 @@ public class SpotItGame extends ApplicationAdapter implements InputProcessor {
 					camera.viewportHeight / -2f,
 					screenY
 			);
+			for (int i = 0; i < symbolsL.length; i++) {
+				for (int j = 0; j < symbolsR.length; j++) {
+					if (symbolsL[i].equals(symbolsR[j])) {
+						if (spritesL[i].getBoundingRectangle().contains(cursorX, cursorY)
+								|| spritesR[j].getBoundingRectangle().contains(cursorX, cursorY)) {
+							isCorrect = true;
+						}
+					}
+				}
+			}
 		}
 		return false;
 	}
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-		cardL = gameDeck.pickCard();
-		cardR = gameDeck.pickCard();
+		if (isCorrect) {
+			cardL = gameDeck.pickCard();
+			cardR = gameDeck.pickCard();
+			isCorrect = false;
+		}
 		return false;
 	}
 
