@@ -2,13 +2,20 @@ package com.spotit.gamev2;
 
 public class GameMaster {
 
+    private final int GUESS_TRIES = 3;
+
     private Deck deck;
     private Player player;
     private Card[] currCardPair;
+    private SymbolSprite[][] currSymbolSprites;
+    private boolean recentAnswer;
 
     public GameMaster(SymbolSet symbolSet, int symbolsPerCard, String playerName) {
         deck = new Deck(symbolSet, symbolsPerCard);
         player = new Player(playerName);
+        currCardPair = null;
+        currSymbolSprites = null;
+        recentAnswer = false;
     }
 
     public Card[] updateCardPair() {
@@ -25,9 +32,36 @@ public class GameMaster {
         return currCardPair;
     }
 
+    public void setCurrSymbolSprites(SymbolSprite[][] currSymbolSprites) {
+        this.currSymbolSprites = currSymbolSprites;
+    }
+
+    public SymbolSprite[][] getCurrSymbolSprites() {
+        return currSymbolSprites;
+    }
+
     public boolean makeGuess(Symbol symbol) {
-        // TODO: Implement makeGuess()
+        System.out.printf("\tGuessed symbol = %s\n", symbol.getName());
+        for (int i = 0; i < currSymbolSprites[0].length; i++) {
+            for (int j = i; j < currSymbolSprites[1].length; j++) {
+                if (currSymbolSprites[0][i].getSymbol().equals(currSymbolSprites[1][j].getSymbol())) {
+                    if (currSymbolSprites[0][i].getSymbol().equals(symbol)) {
+                        recentAnswer = true;
+                        player.addPoint();
+                        return true;
+                    }
+                    else {
+                        recentAnswer = false;
+                        return false;
+                    }
+                }
+            }
+        }
         return false;
+    }
+
+    public boolean getRecentAnswer() {
+        return recentAnswer;
     }
 
     public int getScore() {

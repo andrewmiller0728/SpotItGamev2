@@ -2,8 +2,6 @@ package com.spotit.gamev2;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,8 +13,6 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
 
 public class SpotItGame extends ApplicationAdapter {
-	OrthographicCamera camera;
-	SpotItInputProcessor inputProcessor;
 
 	ShapeRenderer shapeRenderer;
 
@@ -24,17 +20,15 @@ public class SpotItGame extends ApplicationAdapter {
 	TextureAtlas spaceAtlas;
 	SymbolSet spaceSet;
 	GameMaster gm;
-	Sprite[] sprites;
+
+	OrthographicCamera camera;
+	SpotItInputProcessor inputProcessor;
 
 	int symbolsPerCard;
 	float cardRadius, symbolSize;
 
 	@Override
 	public void create () {
-		camera = new OrthographicCamera(3000f, 2000f);
-		inputProcessor = new SpotItInputProcessor(camera);
-		Gdx.input.setInputProcessor(inputProcessor);
-
 		shapeRenderer = new ShapeRenderer();
 
 		batch = new SpriteBatch();
@@ -50,7 +44,10 @@ public class SpotItGame extends ApplicationAdapter {
 		spaceSet = new SymbolSet("Space Pack", names, colors);
 		gm = new GameMaster(spaceSet, symbolsPerCard = 6, "Andrew");
 		gm.updateCardPair();
-		sprites = new Sprite[symbolsPerCard * 2];
+
+		camera = new OrthographicCamera(3000f, 2000f);
+		inputProcessor = new SpotItInputProcessor(camera, gm);
+		Gdx.input.setInputProcessor(inputProcessor);
 
 		cardRadius = camera.viewportHeight / 4f;
 		symbolSize = cardRadius * 2f / symbolsPerCard;
@@ -61,7 +58,7 @@ public class SpotItGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0x2b / 255f, 0x2b / 255f, 0x2b / 255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		drawCards(gm.getCurrCardPair());
+		gm.setCurrSymbolSprites(drawCards(gm.getCurrCardPair()));
 	}
 
 	@Override
@@ -71,7 +68,7 @@ public class SpotItGame extends ApplicationAdapter {
 		spaceAtlas.dispose();
 	}
 
-	private Sprite[] drawCards(Card[] cards) {
+	private SymbolSprite[][] drawCards(Card[] cards) {
 		Symbol[][] symbols = {
 				cards[0].getSymbols(),
 				cards[1].getSymbols()
@@ -91,30 +88,31 @@ public class SpotItGame extends ApplicationAdapter {
 		}
 		shapeRenderer.end();
 
-		sprites = new Sprite[symbolsPerCard * 2];
-		int spritesIndex = 0;
-		for (int i = 0; i < cardCircles.length; i++) {
+		SymbolSprite[][] symbolSprites = new SymbolSprite[gm.getCurrCardPair().length][symbolsPerCard];
+		for (int i = 0; i < gm.getCurrCardPair().length; i++) {
 			float angle = 0f;
 			Circle cardCircle = cardCircles[i];
-			for (Symbol symbol : symbols[i]) {
-				Sprite currSprite = spaceAtlas.createSprite(symbol.getName());
+			for (int j = 0; j < symbols[i].length; j++) {
+				Symbol currSymbol = symbols[i][j];
+				Sprite currSprite = spaceAtlas.createSprite(currSymbol.getName());
 				currSprite.setSize(symbolSize, symbolSize);
 				currSprite.setCenter(
 						cardCircle.x + (cardCircle.radius * MathUtils.cosDeg(angle)) / 2f,
 						cardCircle.y + (cardCircle.radius * MathUtils.sinDeg(angle)) / 2f
 				);
-				sprites[spritesIndex] = currSprite;
-				spritesIndex++;
-				angle += 360f / (float) symbolsPerCard;
+				symbolSprites[i][j] = new SymbolSprite(currSymbol, currSprite);
+					angle += 360f / (float) symbolsPerCard;
 			}
 		}
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		for (Sprite sprite : sprites) {
-			sprite.draw(batch);
+		for (SymbolSprite[] symbolSpritesRow : symbolSprites) {
+			for (SymbolSprite symbolSprite : symbolSpritesRow) {
+				symbolSprite.getSprite().draw(batch);
+			}
 		}
 		batch.end();
-		return sprites;
+		return symbolSprites;
 	}
 
 }

@@ -5,14 +5,19 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class SpotItInputProcessor implements InputProcessor {
 
     private OrthographicCamera camera;
+    private GameMaster gm;
+    private SymbolSprite[][] currSymbolSprites;
 
-    public SpotItInputProcessor(OrthographicCamera currCam) {
+    public SpotItInputProcessor(OrthographicCamera currCam, GameMaster gm) {
         super();
         camera = currCam;
+        this.gm = gm;
+        currSymbolSprites = gm.getCurrSymbolSprites();
     }
 
     @Override
@@ -32,29 +37,44 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        System.out.println("Touched down");
         if (button == Input.Buttons.LEFT && pointer == 0) {
-            float cursorX = MathUtils.map(
-                    0,
-                    Gdx.graphics.getWidth(),
-                    camera.viewportWidth / -2f,
-                    camera.viewportWidth / 2f,
-                    screenX
+            Vector2 cursor = new Vector2(
+                    MathUtils.map(
+                            0,
+                            Gdx.graphics.getWidth(),
+                            camera.viewportWidth / -2f,
+                            camera.viewportWidth / 2f,
+                            screenX
+                    ),
+                    MathUtils.map(
+                            0,
+                            Gdx.graphics.getHeight(),
+                            camera.viewportHeight / 2f,
+                            camera.viewportHeight / -2f,
+                            screenY
+                    )
             );
-            float cursorY = MathUtils.map(
-                    0,
-                    Gdx.graphics.getHeight(),
-                    camera.viewportHeight / 2f,
-                    camera.viewportHeight / -2f,
-                    screenY
-            );
-            // TODO: Handle clicking a symbol
+            System.out.printf("\tCursor position = (%.1f,%.1f)\n", cursor.x, cursor.y);
+            currSymbolSprites = gm.getCurrSymbolSprites();
+            for (int i = 0; i < currSymbolSprites.length; i++) {
+                for (int j = 0; j < currSymbolSprites[i].length; j++) {
+                    if (currSymbolSprites[i][j].getSprite().getBoundingRectangle().contains(cursor)) {
+                        gm.makeGuess(currSymbolSprites[i][j].getSymbol());
+                    }
+                }
+            }
         }
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        // TODO: if the clicked symbol is the matching symbol, give a point
+        System.out.println("Touched up");
+        if (gm.getRecentAnswer()) {
+            System.out.printf("\tCurrent Score = %d\n", gm.getScore());
+            gm.updateCardPair();
+        }
         return false;
     }
 
