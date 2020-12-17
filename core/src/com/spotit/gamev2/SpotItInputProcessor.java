@@ -37,7 +37,6 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        System.out.println("Touched down");
         if (button == Input.Buttons.LEFT && pointer == 0) {
             Vector2 cursor = new Vector2(
                     MathUtils.map(
@@ -55,7 +54,6 @@ public class SpotItInputProcessor implements InputProcessor {
                             screenY
                     )
             );
-            System.out.printf("\tCursor position = (%.1f,%.1f)\n", cursor.x, cursor.y);
             currSymbolSprites = gm.getCurrSymbolSprites();
             for (int i = 0; i < currSymbolSprites.length; i++) {
                 for (int j = 0; j < currSymbolSprites[i].length; j++) {
@@ -70,9 +68,7 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        System.out.println("Touched up");
         if (gm.getRecentAnswer()) {
-            System.out.printf("\tCurrent Score = %d\n", gm.getScore());
             gm.updateCardPair();
         }
         return false;

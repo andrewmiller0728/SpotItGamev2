@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -17,6 +18,8 @@ public class SpotItGame extends ApplicationAdapter {
 	ShapeRenderer shapeRenderer;
 
 	SpriteBatch batch;
+	BitmapFont font;
+
 	TextureAtlas spaceAtlas;
 	SymbolSet spaceSet;
 	GameMaster gm;
@@ -32,6 +35,9 @@ public class SpotItGame extends ApplicationAdapter {
 		shapeRenderer = new ShapeRenderer();
 
 		batch = new SpriteBatch();
+		font = new BitmapFont(Gdx.files.internal("segoeUIblack_128.fnt"));
+		font.setColor(Color.WHITE);
+
 		spaceAtlas = new TextureAtlas("SpaceIcons.atlas");
 		int atlasLength = spaceAtlas.getRegions().size;
 
@@ -59,6 +65,23 @@ public class SpotItGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		gm.setCurrSymbolSprites(drawCards(gm.getCurrCardPair()));
+		String playerText = String.format("Player: %s", gm.getPlayer().getName());
+		String scoreText = String.format("Score: %d", gm.getPlayer().getScore());
+
+		batch.begin();
+		font.draw(
+				batch,
+				playerText,
+				0f - 64f * playerText.length() / 2f,
+				3f/4f * camera.viewportHeight / 2f
+		);
+		font.draw(
+				batch,
+				scoreText,
+				0f - 64f * scoreText.length() / 2f,
+				3f/4f * camera.viewportHeight / 2f - 160f
+		);
+		batch.end();
 	}
 
 	@Override
@@ -66,6 +89,7 @@ public class SpotItGame extends ApplicationAdapter {
 		shapeRenderer.dispose();
 		batch.dispose();
 		spaceAtlas.dispose();
+		font.dispose();
 	}
 
 	private SymbolSprite[][] drawCards(Card[] cards) {

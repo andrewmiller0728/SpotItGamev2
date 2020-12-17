@@ -64,8 +64,7 @@ public class GameMaster {
         return recentAnswer;
     }
 
-    public int getScore() {
-        return player.getScore();
+    public Player getPlayer() {
+        return player;
     }
-
 }
