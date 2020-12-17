@@ -104,11 +104,11 @@ public class SpotItGame extends ApplicationAdapter {
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		for (int i = 0; i < cardCircles.length; i++) {
+		for (Circle circle : cardCircles) {
 			shapeRenderer.setColor(new Color(0xB1 / 255f, 0x5B / 255f, 0x2E / 255f, 1));
-			shapeRenderer.circle(cardCircles[i].x, cardCircles[i].y, cardCircles[i].radius);
+			shapeRenderer.circle(circle.x, circle.y, circle.radius);
 			shapeRenderer.setColor(Color.DARK_GRAY);
-			shapeRenderer.circle(cardCircles[i].x, cardCircles[i].y, cardCircles[i].radius * 0.95f);
+			shapeRenderer.circle(circle.x, circle.y, circle.radius * 0.95f);
 		}
 		shapeRenderer.end();
 

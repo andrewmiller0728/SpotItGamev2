@@ -2,12 +2,10 @@ package com.spotit.gamev2;
 
 import com.badlogic.gdx.graphics.g2d.Sprite;
 
-import java.util.Objects;
-
 public class SymbolSprite {
 
-    private Symbol symbol;
-    private Sprite sprite;
+    private final Symbol symbol;
+    private final Sprite sprite;
 
     public SymbolSprite(Symbol symbol, Sprite sprite) {
         this.symbol = symbol;

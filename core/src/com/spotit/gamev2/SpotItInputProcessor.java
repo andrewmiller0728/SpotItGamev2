@@ -9,15 +9,17 @@ import com.badlogic.gdx.math.Vector2;
 
 public class SpotItInputProcessor implements InputProcessor {
 
-    private OrthographicCamera camera;
-    private GameMaster gm;
+    private final OrthographicCamera camera;
+    private final GameMaster gm;
     private SymbolSprite[][] currSymbolSprites;
+    private boolean isGuessCorrect;
 
     public SpotItInputProcessor(OrthographicCamera currCam, GameMaster gm) {
         super();
         camera = currCam;
         this.gm = gm;
         currSymbolSprites = gm.getCurrSymbolSprites();
+        isGuessCorrect = false;
     }
 
     @Override
@@ -55,22 +57,29 @@ public class SpotItInputProcessor implements InputProcessor {
                     )
             );
             currSymbolSprites = gm.getCurrSymbolSprites();
-            for (int i = 0; i < currSymbolSprites.length; i++) {
-                for (int j = 0; j < currSymbolSprites[i].length; j++) {
-                    if (currSymbolSprites[i][j].getSprite().getBoundingRectangle().contains(cursor)) {
-                        gm.makeGuess(currSymbolSprites[i][j].getSymbol());
+            for (SymbolSprite[] currSymbolSpriteRow : currSymbolSprites) {
+                for (SymbolSprite symbolSprite : currSymbolSpriteRow) {
+                    System.out.printf("Checking %s for cursor...\n", symbolSprite.getSymbol().getName());
+                    if (symbolSprite.getSprite().getBoundingRectangle().contains(cursor)) {
+                        System.out.println("\tFound cursor!");
+                        isGuessCorrect = gm.makeGuess(symbolSprite.getSymbol());
+                        return true;
                     }
                 }
             }
+            return true;
         }
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (gm.getRecentAnswer()) {
+        if (isGuessCorrect) {
+            System.out.println("Guess was correct!");
             gm.updateCardPair();
         }
+        isGuessCorrect = false;
+
         return false;
     }
 
