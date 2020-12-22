@@ -59,9 +59,7 @@ public class SpotItInputProcessor implements InputProcessor {
             currSymbolSprites = gm.getCurrSymbolSprites();
             for (SymbolSprite[] currSymbolSpriteRow : currSymbolSprites) {
                 for (SymbolSprite symbolSprite : currSymbolSpriteRow) {
-                    System.out.printf("Checking %s for cursor...\n", symbolSprite.getSymbol().getName());
                     if (symbolSprite.getSprite().getBoundingRectangle().contains(cursor)) {
-                        System.out.println("\tFound cursor!");
                         isGuessCorrect = gm.makeGuess(symbolSprite.getSymbol());
                         return true;
                     }
@@ -75,7 +73,6 @@ public class SpotItInputProcessor implements InputProcessor {
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         if (isGuessCorrect) {
-            System.out.println("Guess was correct!");
             gm.updateCardPair();
         }
         isGuessCorrect = false;

@@ -48,7 +48,7 @@ public class SpotItGame extends ApplicationAdapter {
 			colors[i] = Color.CLEAR;
 		}
 		spaceSet = new SymbolSet("Space Pack", names, colors);
-		gm = new GameMaster(spaceSet, symbolsPerCard = 6, "Andrew");
+		gm = new GameMaster(spaceSet, symbolsPerCard = 8, "Charlotte");
 		gm.updateCardPair();
 
 		camera = new OrthographicCamera(3000f, 2000f);
@@ -64,24 +64,7 @@ public class SpotItGame extends ApplicationAdapter {
 		Gdx.gl.glClearColor(0x2b / 255f, 0x2b / 255f, 0x2b / 255f, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-		gm.setCurrSymbolSprites(drawCards(gm.getCurrCardPair()));
-		String playerText = String.format("Player: %s", gm.getPlayer().getName());
-		String scoreText = String.format("Score: %d", gm.getPlayer().getScore());
-
-		batch.begin();
-		font.draw(
-				batch,
-				playerText,
-				0f - 64f * playerText.length() / 2f,
-				3f/4f * camera.viewportHeight / 2f
-		);
-		font.draw(
-				batch,
-				scoreText,
-				0f - 64f * scoreText.length() / 2f,
-				3f/4f * camera.viewportHeight / 2f - 160f
-		);
-		batch.end();
+		runGameScreen();
 	}
 
 	@Override
@@ -90,6 +73,33 @@ public class SpotItGame extends ApplicationAdapter {
 		batch.dispose();
 		spaceAtlas.dispose();
 		font.dispose();
+	}
+
+	private void runGameScreen() {
+		try {
+			gm.setCurrSymbolSprites(drawCards(gm.getCurrCardPair()));
+
+			String playerText = String.format("Player: %s", gm.getPlayer().getName());
+			String scoreText = String.format("Score: %d", gm.getPlayer().getScore());
+			batch.begin();
+			font.draw(
+					batch,
+					playerText + "    " + scoreText,
+					3f / 4f * camera.viewportWidth / -2f,
+					3f / 4f * camera.viewportHeight / 2f
+			);
+			batch.end();
+		}
+		catch (NullPointerException npe) {
+			batch.begin();
+			font.draw(
+					batch,
+					"GAME OVER",
+					3f / 4f * camera.viewportWidth / -2f,
+					3f / 4f * camera.viewportHeight / 2f
+			);
+			batch.end();
+		}
 	}
 
 	private SymbolSprite[][] drawCards(Card[] cards) {
