@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 
 public class SpotItGame extends ApplicationAdapter {
 
@@ -28,7 +29,7 @@ public class SpotItGame extends ApplicationAdapter {
 	SpotItInputProcessor inputProcessor;
 
 	int symbolsPerCard;
-	float cardRadius, symbolSize;
+	float symbolSize;
 
 	@Override
 	public void create () {
@@ -55,8 +56,7 @@ public class SpotItGame extends ApplicationAdapter {
 		inputProcessor = new SpotItInputProcessor(camera, gm);
 		Gdx.input.setInputProcessor(inputProcessor);
 
-		cardRadius = camera.viewportHeight / 4f;
-		symbolSize = cardRadius * 2f / symbolsPerCard;
+		symbolSize = camera.viewportHeight / 4f * 2f / symbolsPerCard;
 	}
 
 	@Override
@@ -107,32 +107,33 @@ public class SpotItGame extends ApplicationAdapter {
 				cards[0].getSymbols(),
 				cards[1].getSymbols()
 		};
-		Circle[] cardCircles = {
-				new Circle(camera.viewportWidth / -4f, 0f, cardRadius),
-				new Circle(camera.viewportWidth / 4f, 0f, cardRadius)
-		};
+
+		cards[0].setCardPosition(new Vector2(camera.viewportWidth / -4f, 0f));
+		cards[0].setCardRadius(camera.viewportHeight / 4f);
+		cards[1].setCardPosition(new Vector2(camera.viewportWidth / 4f, 0f));
+		cards[1].setCardRadius((camera.viewportHeight / 4f));
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		for (Circle circle : cardCircles) {
+		for (Card card : cards) {
 			shapeRenderer.setColor(new Color(0xB1 / 255f, 0x5B / 255f, 0x2E / 255f, 1));
-			shapeRenderer.circle(circle.x, circle.y, circle.radius);
+			shapeRenderer.circle(card.getCircle().x, card.getCircle().y, card.getCircle().radius);
 			shapeRenderer.setColor(Color.DARK_GRAY);
-			shapeRenderer.circle(circle.x, circle.y, circle.radius * 0.95f);
+			shapeRenderer.circle(card.getCircle().x, card.getCircle().y, card.getCircle().radius * 0.95f);
 		}
 		shapeRenderer.end();
 
 		SymbolSprite[][] symbolSprites = new SymbolSprite[gm.getCurrCardPair().length][symbolsPerCard];
-		for (int i = 0; i < gm.getCurrCardPair().length; i++) {
+		for (int i = 0; i < cards.length; i++) {
 			float angle = 0f;
-			Circle cardCircle = cardCircles[i];
+			Card currCard = cards[i];
 			for (int j = 0; j < symbols[i].length; j++) {
 				Symbol currSymbol = symbols[i][j];
 				Sprite currSprite = spaceAtlas.createSprite(currSymbol.getName());
 				currSprite.setSize(symbolSize, symbolSize);
 				currSprite.setCenter(
-						cardCircle.x + (cardCircle.radius * MathUtils.cosDeg(angle)) / 2f,
-						cardCircle.y + (cardCircle.radius * MathUtils.sinDeg(angle)) / 2f
+						currCard.getCircle().x + (currCard.getCircle().radius * MathUtils.cosDeg(angle)) / 2f,
+						currCard.getCircle().y + (currCard.getCircle().radius * MathUtils.sinDeg(angle)) / 2f
 				);
 				symbolSprites[i][j] = new SymbolSprite(currSymbol, currSprite);
 					angle += 360f / (float) symbolsPerCard;

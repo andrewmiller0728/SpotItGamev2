@@ -1,6 +1,9 @@
 package com.spotit.gamev2;
 
 
+import com.badlogic.gdx.math.Circle;
+import com.badlogic.gdx.math.Vector2;
+
 import java.util.Arrays;
 
 public class Card {
@@ -8,13 +11,15 @@ public class Card {
 
     /* Variables */
 
-    private Symbol[] symbols;
+    private final Symbol[] symbols;
+    private final Circle circle;
 
 
     /* Constructor */
 
     public Card(Symbol[] symbols) {
         this.symbols = symbols;
+        circle = new Circle();
     }
 
 
@@ -27,6 +32,18 @@ public class Card {
             }
         }
         return false;
+    }
+
+    public Circle getCircle() {
+        return circle;
+    }
+
+    public void setCardPosition(Vector2 pos) {
+        circle.setPosition(pos);
+    }
+
+    public void setCardRadius(float r) {
+        circle.setRadius(r);
     }
 
     public Symbol[] getSymbols() {
@@ -42,8 +59,8 @@ public class Card {
 
     public String toFormattedString() {
         String s = "Card->{\n\t\tsymbols=\n";
-        for (int i = 0; i < symbols.length; i++) {
-            s = s.concat(String.format("\t\t\t%s\n", symbols[i].toString()));
+        for (Symbol symbol : symbols) {
+            s = s.concat(String.format("\t\t\t%s\n", symbol.toString()));
         }
         return s.concat("\t\t}");
     }
