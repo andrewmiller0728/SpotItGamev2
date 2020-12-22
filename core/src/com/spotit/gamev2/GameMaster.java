@@ -43,6 +43,10 @@ public class GameMaster {
         return currSymbolSprites;
     }
 
+    public Deck getDeck() {
+        return deck;
+    }
+
     public boolean makeGuess(Symbol symbol) {
         for (int i = 0; i < currSymbolSprites[0].length; i++) {
             for (int j = 0; j < currSymbolSprites[1].length; j++) {

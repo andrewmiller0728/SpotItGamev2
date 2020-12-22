@@ -21,7 +21,6 @@ public class SpotItGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	BitmapFont font;
 
-	TextureAtlas spaceAtlas;
 	GameMaster gm;
 
 	OrthographicCamera camera;
@@ -38,16 +37,6 @@ public class SpotItGame extends ApplicationAdapter {
 		font = new BitmapFont(Gdx.files.internal("segoeUIblack_128.fnt"));
 		font.setColor(Color.WHITE);
 
-		spaceAtlas = new TextureAtlas("SpaceIcons.atlas");
-		int atlasLength = spaceAtlas.getRegions().size;
-
-		String[] names = new String[atlasLength];
-		Color[] colors = new Color[atlasLength];
-		for (int i = 0; i < atlasLength; i++) {
-			names[i] = String.format("(%d)", i + 1);
-			colors[i] = Color.CLEAR;
-		}
-//		spaceSet = new SymbolSet("Space Pack", names, colors);
 		gm = new GameMaster("SpaceIcons.atlas", symbolsPerCard = 8, "Charlotte");
 		gm.updateCardPair();
 
@@ -70,13 +59,13 @@ public class SpotItGame extends ApplicationAdapter {
 	public void dispose () {
 		shapeRenderer.dispose();
 		batch.dispose();
-		spaceAtlas.dispose();
+		gm.getDeck().getTextureAtlas().dispose();
 		font.dispose();
 	}
 
 	private void runGameScreen() {
 		try {
-			gm.setCurrSymbolSprites(drawCards(gm.getCurrCardPair()));
+			drawCards(gm.getCurrCardPair());
 
 			String playerText = String.format("Player: %s", gm.getPlayer().getName());
 			String scoreText = String.format("Score: %d", gm.getPlayer().getScore());
@@ -101,12 +90,7 @@ public class SpotItGame extends ApplicationAdapter {
 		}
 	}
 
-	private SymbolSprite[][] drawCards(Card[] cards) {
-		Symbol[][] symbols = {
-				cards[0].getSymbols(),
-				cards[1].getSymbols()
-		};
-
+	private void drawCards(Card[] cards) {
 		cards[0].setCardPosition(new Vector2(camera.viewportWidth / -4f, 0f));
 		cards[0].setCardRadius(camera.viewportHeight / 4f);
 		cards[1].setCardPosition(new Vector2(camera.viewportWidth / 4f, 0f));
@@ -122,31 +106,27 @@ public class SpotItGame extends ApplicationAdapter {
 		}
 		shapeRenderer.end();
 
-		SymbolSprite[][] symbolSprites = new SymbolSprite[gm.getCurrCardPair().length][symbolsPerCard];
-		for (int i = 0; i < cards.length; i++) {
-			float angle = 0f;
-			Card currCard = cards[i];
-			for (int j = 0; j < symbols[i].length; j++) {
-				Symbol currSymbol = symbols[i][j];
-				Sprite currSprite = spaceAtlas.createSprite(currSymbol.getName());
-				currSprite.setSize(symbolSize, symbolSize);
-				currSprite.setCenter(
-						currCard.getCircle().x + (currCard.getCircle().radius * MathUtils.cosDeg(angle)) / 2f,
-						currCard.getCircle().y + (currCard.getCircle().radius * MathUtils.sinDeg(angle)) / 2f
-				);
-				symbolSprites[i][j] = new SymbolSprite(currSymbol, currSprite);
-					angle += 360f / (float) symbolsPerCard;
-			}
-		}
+		Symbol[][] symbols = {
+				cards[0].getSymbols(),
+				cards[1].getSymbols()
+		};
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		for (SymbolSprite[] symbolSpritesRow : symbolSprites) {
-			for (SymbolSprite symbolSprite : symbolSpritesRow) {
-				symbolSprite.getSprite().draw(batch);
+		for (int i = 0; i < cards.length; i++) {
+			float angle = 0f;
+			for (int j = 0; j < symbols[i].length; j++) {
+				Sprite currSprite = symbols[i][j].getSprite();
+				currSprite.setSize(symbolSize, symbolSize);
+				currSprite.setCenter(
+						cards[i].getCircle().x + (cards[i].getCircle().radius * MathUtils.cosDeg(angle)) / 2f,
+						cards[i].getCircle().y + (cards[i].getCircle().radius * MathUtils.sinDeg(angle)) / 2f
+				);
+				currSprite.draw(batch);
+				angle += 360f / (float) symbolsPerCard;
 			}
 		}
 		batch.end();
-		return symbolSprites;
 	}
 
 }

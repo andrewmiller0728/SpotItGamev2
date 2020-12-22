@@ -10,11 +10,10 @@ public class Deck {
 
     /* Variables */
 
+    private TextureAtlas atlas;
     private String setName;
     private Card[] cards;
     private int index; // top of deck. ex: 5 cards in deck, index = 4
-
-    private TextureAtlas atlas;
 
     /* Constructor */
 
@@ -29,7 +28,52 @@ public class Deck {
 
     /* Methods */
 
-    public Card[] generateCards(int symbolPerCard) {
+    public Card pickCard() {
+        if (index == -1) {
+            return null;
+        }
+        else {
+            Card c = cards[index];
+            cards[index] = null;
+            index--;
+            return c;
+        }
+    }
+
+    public TextureAtlas getTextureAtlas() {
+        return atlas;
+    }
+
+    private boolean contains(Card c) {
+        for (Card d : cards) {
+            if (d.equals(c)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Deck->{" +
+                "setName=\"" + setName +
+                "\", index=" + index +
+                ", cards=" + Arrays.toString(cards) +
+                "}";
+    }
+
+    public String toFormattedString() {
+        String s = "Deck->{" +
+                "\n\tsetName=\"" + setName +
+                "\",\n\tindex=" + index +
+                ",\n\tcards=\n";
+        for (int i = 0; i < cards.length; i++) {
+            s = s.concat(String.format("\t\t%s\n", cards[i].toFormattedString()));
+        }
+        return s.concat("}");
+    }
+
+    private Card[] generateCards(int symbolPerCard) {
         if (!isPrime(symbolPerCard - 1)) {
             throw new IllegalArgumentException("Number of symbols must be prime + 1");
         }
@@ -92,47 +136,5 @@ public class Deck {
         }
         return cards;
     }
-
-    public Card pickCard() {
-        if (index == -1) {
-            return null;
-        }
-        else {
-            Card c = cards[index];
-            cards[index] = null;
-            index--;
-            return c;
-        }
-    }
-
-    private boolean contains(Card c) {
-        for (Card d : cards) {
-            if (d.equals(c)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return "Deck->{" +
-                "setName=\"" + setName +
-                "\", index=" + index +
-                ", cards=" + Arrays.toString(cards) +
-                "}";
-    }
-
-    public String toFormattedString() {
-        String s = "Deck->{" +
-                "\n\tsetName=\"" + setName +
-                "\",\n\tindex=" + index +
-                ",\n\tcards=\n";
-        for (int i = 0; i < cards.length; i++) {
-            s = s.concat(String.format("\t\t%s\n", cards[i].toFormattedString()));
-        }
-        return s.concat("}");
-    }
-
 
 }
