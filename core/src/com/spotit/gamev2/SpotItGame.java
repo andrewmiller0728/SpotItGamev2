@@ -22,7 +22,6 @@ public class SpotItGame extends ApplicationAdapter {
 	BitmapFont font;
 
 	TextureAtlas spaceAtlas;
-	SymbolSet spaceSet;
 	GameMaster gm;
 
 	OrthographicCamera camera;
@@ -48,8 +47,8 @@ public class SpotItGame extends ApplicationAdapter {
 			names[i] = String.format("(%d)", i + 1);
 			colors[i] = Color.CLEAR;
 		}
-		spaceSet = new SymbolSet("Space Pack", names, colors);
-		gm = new GameMaster(spaceSet, symbolsPerCard = 8, "Charlotte");
+//		spaceSet = new SymbolSet("Space Pack", names, colors);
+		gm = new GameMaster("SpaceIcons.atlas", symbolsPerCard = 8, "Charlotte");
 		gm.updateCardPair();
 
 		camera = new OrthographicCamera(3000f, 2000f);

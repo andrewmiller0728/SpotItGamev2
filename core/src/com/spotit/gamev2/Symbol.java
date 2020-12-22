@@ -2,6 +2,7 @@ package com.spotit.gamev2;
 
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 
 import java.util.Objects;
 
@@ -12,15 +13,21 @@ public class Symbol {
     /* Variables */
 
     private String name;
-    private Color color;
+    private Sprite sprite;
     private boolean selected;
 
 
     /* Constructor */
 
-    public Symbol(String n, Color c) {
-        name = n.toUpperCase();
-        color = c;
+    public Symbol(String name) {
+        this.name = name.toUpperCase();
+        sprite = null;
+        selected = false;
+    }
+
+    public Symbol(String name, Sprite s) {
+        this.name = name.toUpperCase();
+        sprite = s;
         selected = false;
     }
 
@@ -31,8 +38,8 @@ public class Symbol {
         return name;
     }
 
-    public Color getColor() {
-        return color;
+    public Sprite getSprite() {
+        return sprite;
     }
 
     public boolean isSelected() {
@@ -47,7 +54,6 @@ public class Symbol {
     public String toString() {
         return "Symbol->{" +
                 "name=\"" + name + "\"" +
-                ", color=\"" + color.toString() + "\"" +
                 "}";
     }
 
@@ -58,7 +64,7 @@ public class Symbol {
         if (o == null || getClass() != o.getClass())
             return false;
         Symbol symbol = (Symbol) o;
-        return name.equals(symbol.name) && color.equals(symbol.color);
+        return name.equals(symbol.name);
     }
 
     @Override

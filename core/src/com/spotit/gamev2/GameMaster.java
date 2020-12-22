@@ -8,8 +8,15 @@ public class GameMaster {
     private Card[] currCardPair;
     private SymbolSprite[][] currSymbolSprites;
 
-    public GameMaster(SymbolSet symbolSet, int symbolsPerCard, String playerName) {
-        deck = new Deck(symbolSet, symbolsPerCard);
+//    public GameMaster(SymbolSet symbolSet, int symbolsPerCard, String playerName) {
+//        deck = new Deck(symbolSet, symbolsPerCard);
+//        player = new Player(playerName);
+//        currCardPair = null;
+//        currSymbolSprites = null;
+//    }
+
+    public GameMaster(String atlasFile, int symbolsPerCard, String playerName) {
+        deck = new Deck(atlasFile, symbolsPerCard);
         player = new Player(playerName);
         currCardPair = null;
         currSymbolSprites = null;
