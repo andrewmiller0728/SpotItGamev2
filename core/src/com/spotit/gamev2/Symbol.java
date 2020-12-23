@@ -14,7 +14,6 @@ public class Symbol {
 
     private String name;
     private Sprite sprite;
-    private boolean selected;
 
 
     /* Constructor */
@@ -22,13 +21,11 @@ public class Symbol {
     public Symbol(String name) {
         this.name = name.toUpperCase();
         sprite = null;
-        selected = false;
     }
 
     public Symbol(String name, Sprite s) {
         this.name = name.toUpperCase();
         sprite = s;
-        selected = false;
     }
 
 
@@ -42,19 +39,20 @@ public class Symbol {
         return sprite;
     }
 
-    public boolean isSelected() {
-        return selected;
-    }
-
-    public void setSelected(boolean selected) {
-        this.selected = selected;
-    }
-
     @Override
     public String toString() {
-        return "Symbol->{" +
-                "name=\"" + name + "\"" +
-                "}";
+        if (sprite != null) {
+            return "Symbol->{" +
+                    "name=\"" + name + "\"" +
+                    ", sprite=" + sprite.toString() +
+                    "}";
+        }
+        else {
+            return "Symbol->{" +
+                    "name=\"" + name + "\"" +
+                    ", sprite=[null]" +
+                    "}";
+        }
     }
 
     @Override

@@ -9,10 +9,19 @@ import com.badlogic.gdx.math.Vector2;
 
 public class SpotItInputProcessor implements InputProcessor {
 
-    OrthographicCamera camera;
-    public SpotItInputProcessor(OrthographicCamera camera) {
+    private final OrthographicCamera camera;
+    private final CommandQueue commandQueue;
+    private CardPair currCardPair;
+
+    public SpotItInputProcessor(OrthographicCamera camera, CommandQueue commandQueue) {
         super();
         this.camera = camera;
+        this.commandQueue = commandQueue;
+        currCardPair = null;
+    }
+
+    public void setCurrCardPair(CardPair currCardPair) {
+        this.currCardPair = currCardPair;
     }
 
     @Override
@@ -32,33 +41,55 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (button == Input.Buttons.LEFT && pointer == 0) {
-            Vector2 cursor = new Vector2(
-                    MathUtils.map(
-                            0,
-                            Gdx.graphics.getWidth(),
-                            camera.viewportWidth / -2f,
-                            camera.viewportWidth / 2f,
-                            screenX
-                    ),
-                    MathUtils.map(
-                            0,
-                            Gdx.graphics.getHeight(),
-                            camera.viewportHeight / 2f,
-                            camera.viewportHeight / -2f,
-                            screenY
-                    )
-            );
-            // TODO: Implement touchDown()
-            System.out.printf("touch down at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
-        }
+        Vector2 cursor = new Vector2(
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getWidth(),
+                        camera.viewportWidth / -2f,
+                        camera.viewportWidth / 2f,
+                        screenX
+                ),
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getHeight(),
+                        camera.viewportHeight / 2f,
+                        camera.viewportHeight / -2f,
+                        screenY
+                )
+        );
+        System.out.printf("touch down at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        // TODO: Implement touchUp()
-        System.out.print("touch up\n");
+        Vector2 cursor = new Vector2(
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getWidth(),
+                        camera.viewportWidth / -2f,
+                        camera.viewportWidth / 2f,
+                        screenX
+                ),
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getHeight(),
+                        camera.viewportHeight / 2f,
+                        camera.viewportHeight / -2f,
+                        screenY
+                )
+        );
+        System.out.printf("touch up at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
+
+        if (button == Input.Buttons.LEFT && pointer == 0 && currCardPair != null) {
+            for (Symbol symbol : currCardPair.getSymbols()) {
+                if (symbol.getSprite().getBoundingRectangle().contains(cursor)) {
+                    commandQueue.add(new SymbolClickedCommand(symbol, currCardPair));
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
