@@ -9,17 +9,10 @@ import com.badlogic.gdx.math.Vector2;
 
 public class SpotItInputProcessor implements InputProcessor {
 
-    private final OrthographicCamera camera;
-    private final GameMaster gm;
-    private SymbolSprite[][] currSymbolSprites;
-    private boolean isGuessCorrect;
-
-    public SpotItInputProcessor(OrthographicCamera currCam, GameMaster gm) {
+    OrthographicCamera camera;
+    public SpotItInputProcessor(OrthographicCamera camera) {
         super();
-        camera = currCam;
-        this.gm = gm;
-        currSymbolSprites = gm.getCurrSymbolSprites();
-        isGuessCorrect = false;
+        this.camera = camera;
     }
 
     @Override
@@ -56,27 +49,16 @@ public class SpotItInputProcessor implements InputProcessor {
                             screenY
                     )
             );
-            currSymbolSprites = gm.getCurrSymbolSprites();
-            for (SymbolSprite[] currSymbolSpriteRow : currSymbolSprites) {
-                for (SymbolSprite symbolSprite : currSymbolSpriteRow) {
-                    if (symbolSprite.getSprite().getBoundingRectangle().contains(cursor)) {
-                        isGuessCorrect = gm.makeGuess(symbolSprite.getSymbol());
-                        return true;
-                    }
-                }
-            }
-            return true;
+            // TODO: Implement touchDown()
+            System.out.printf("touch down at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
         }
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isGuessCorrect) {
-            gm.updateCardPair();
-        }
-        isGuessCorrect = false;
-
+        // TODO: Implement touchUp()
+        System.out.print("touch up\n");
         return false;
     }
 

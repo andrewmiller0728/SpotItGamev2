@@ -21,7 +21,6 @@ public class Deck {
         atlas = new TextureAtlas(atlasFile);
         setName = atlasFile.substring(0, atlasFile.indexOf("."));
         cards = generateCards(symbolPerCard);
-        //cards = shuffleCards(cards); // TODO: Shuffle cards
         index = cards.length - 1;
     }
 
@@ -45,8 +44,8 @@ public class Deck {
     }
 
     private boolean contains(Card c) {
-        for (Card d : cards) {
-            if (d.equals(c)) {
+        for (Card card : cards) {
+            if (card.equals(c)) {
                 return true;
             }
         }
@@ -105,7 +104,7 @@ public class Deck {
             }
         }
 
-        return deck.toArray(new Card[0]);
+        return shuffleCards(deck.toArray(new Card[0])); // TODO: Shuffle cards before returning
     }
 
     private boolean isPrime(int n) {

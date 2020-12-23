@@ -26,8 +26,8 @@ public class Card {
     /* Methods */
 
     public boolean contains(Symbol s) {
-        for (Symbol t : symbols) {
-            if (t.equals(s)) {
+        for (Symbol symbol : symbols) {
+            if (symbol.equals(s)) {
                 return true;
             }
         }
