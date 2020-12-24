@@ -54,7 +54,7 @@ public class SpotItGame extends ApplicationAdapter {
 
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		shapeRenderer.setColor(Color.WHITE);
+		shapeRenderer.setColor(Color.ORANGE);
 		shapeRenderer.circle(
 				currCardPair.cardL.getCircle().x,
 				currCardPair.cardL.getCircle().y,
@@ -64,6 +64,17 @@ public class SpotItGame extends ApplicationAdapter {
 				currCardPair.cardR.getCircle().x,
 				currCardPair.cardR.getCircle().y,
 				currCardPair.cardR.getCircle().radius
+		);
+		shapeRenderer.setColor(Color.DARK_GRAY);
+		shapeRenderer.circle(
+				currCardPair.cardL.getCircle().x,
+				currCardPair.cardL.getCircle().y,
+				currCardPair.cardL.getCircle().radius * 0.95f
+		);
+		shapeRenderer.circle(
+				currCardPair.cardR.getCircle().x,
+				currCardPair.cardR.getCircle().y,
+				currCardPair.cardR.getCircle().radius * 0.95f
 		);
 		shapeRenderer.end();
 
