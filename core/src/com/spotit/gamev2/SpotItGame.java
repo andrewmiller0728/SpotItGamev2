@@ -19,6 +19,7 @@ public class SpotItGame extends ApplicationAdapter {
 	SpriteBatch batch;
 	BitmapFont font;
 
+	Player player;
 	Deck deck;
 	CardPair currCardPair;
 	CommandQueue commandQueue;
@@ -31,9 +32,10 @@ public class SpotItGame extends ApplicationAdapter {
 		shapeRenderer = new ShapeRenderer();
 
 		batch = new SpriteBatch();
-		font = new BitmapFont(Gdx.files.internal("segoeUIblack_128.fnt"));
+		font = new BitmapFont(Gdx.files.internal("segoeUIblack_32.fnt"));
 		font.setColor(Color.WHITE);
 
+		player = new Player("Andrew");
 		deck = new Deck("SpaceIcons.atlas", 6);
 		currCardPair = null;
 		commandQueue = new CommandQueue();
@@ -50,8 +52,29 @@ public class SpotItGame extends ApplicationAdapter {
 
 		update();
 
+		shapeRenderer.setProjectionMatrix(camera.combined);
+		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+		shapeRenderer.setColor(Color.WHITE);
+		shapeRenderer.circle(
+				currCardPair.cardL.getCircle().x,
+				currCardPair.cardL.getCircle().y,
+				currCardPair.cardL.getCircle().radius
+		);
+		shapeRenderer.circle(
+				currCardPair.cardR.getCircle().x,
+				currCardPair.cardR.getCircle().y,
+				currCardPair.cardR.getCircle().radius
+		);
+		shapeRenderer.end();
+
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
+		font.draw(batch, String.format(
+				"Score: %d",
+				player.getScore()),
+				camera.viewportWidth / -2f + 50f,
+				camera.viewportHeight / 2f - 50f
+		);
 		for (Symbol symbol : currCardPair.getSymbols()) {
 			symbol.getSprite().draw(batch);
 		}
@@ -66,40 +89,51 @@ public class SpotItGame extends ApplicationAdapter {
 	}
 
 	private void update() {
-		if (currCardPair == null || currCardPair.solved) {
+		if (currCardPair == null) {
 			currCardPair = deck.pickCardPair();
-
-			float angle = 0f; // Degrees
-
-			Card cardL = currCardPair.cardL;
-			cardL.setCardPosition(new Vector2(camera.viewportWidth / -4f, 0f));
-			cardL.setCardRadius(100f);
-			for (Symbol symbolL : cardL.getSymbols()) {
-				symbolL.getSprite().setBounds(
-						cardL.getCircle().x + cardL.getCircle().radius * MathUtils.cosDeg(angle),
-						cardL.getCircle().y + cardL.getCircle().radius * MathUtils.sinDeg(angle),
-						cardL.getCircle().radius * 0.75f,
-						cardL.getCircle().radius * 0.75f
-				);
-				angle += 360f / cardL.getSymbols().length;
-			}
-
-			Card cardR = currCardPair.cardR;
-			cardR.setCardPosition(new Vector2(camera.viewportWidth / 4f, 0f));
-			cardR.setCardRadius(100f);
-			for (Symbol symbolR : cardR.getSymbols()) {
-				symbolR.getSprite().setBounds(
-						cardR.getCircle().x + cardR.getCircle().radius * MathUtils.cosDeg(angle),
-						cardR.getCircle().y + cardR.getCircle().radius * MathUtils.sinDeg(angle),
-						cardR.getCircle().radius * 0.75f,
-						cardR.getCircle().radius * 0.75f
-				);
-				angle += 360f / cardR.getSymbols().length;
-			}
 		}
+		else if (currCardPair.solved) {
+			currCardPair = deck.pickCardPair();
+			commandQueue.add(new ScorePointsCommand(player, 1));
+		}
+		arrangeSymbolSprites(200f, 0.5f);
 
 		inputProcessor.setCurrCardPair(currCardPair);
 		commandQueue.tick();
+	}
+
+	private void arrangeSymbolSprites(float cardRadius, float symbolSizeFactor) {
+		float angle = 0f; // degrees
+
+		Card cardL = currCardPair.cardL;
+		cardL.setCardPosition(new Vector2(camera.viewportWidth / -4f, 0f));
+		cardL.setCardRadius(cardRadius);
+		for (Symbol symbolL : cardL.getSymbols()) {
+			symbolL.getSprite().setSize(
+					cardL.getCircle().radius * symbolSizeFactor,
+					cardL.getCircle().radius * symbolSizeFactor
+			);
+			symbolL.getSprite().setCenter(
+					cardL.getCircle().x -  + cardL.getCircle().radius * 0.6f * MathUtils.cosDeg(angle),
+					cardL.getCircle().y + cardL.getCircle().radius * 0.6f * MathUtils.sinDeg(angle)
+			);
+			angle += 360f / cardL.getSymbols().length;
+		}
+
+		Card cardR = currCardPair.cardR;
+		cardR.setCardPosition(new Vector2(camera.viewportWidth / 4f, 0f));
+		cardR.setCardRadius(cardRadius);
+		for (Symbol symbolR : cardR.getSymbols()) {
+			symbolR.getSprite().setSize(
+					cardR.getCircle().radius * symbolSizeFactor,
+					cardR.getCircle().radius * symbolSizeFactor
+			);
+			symbolR.getSprite().setCenter(
+					cardR.getCircle().x + cardR.getCircle().radius * 0.6f * MathUtils.cosDeg(angle),
+					cardR.getCircle().y + cardR.getCircle().radius * 0.6f * MathUtils.sinDeg(angle)
+			);
+			angle += 360f / cardR.getSymbols().length;
+		}
 	}
 
 }

@@ -22,8 +22,16 @@ public class Player {
         score++;
     }
 
+    public void addPoints(int points) {
+        score += points;
+    }
+
     public void losePoint() {
         score--;
+    }
+
+    public void losePoints(int points) {
+        score -= points;
     }
 
 }
