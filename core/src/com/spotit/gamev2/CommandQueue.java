@@ -20,4 +20,10 @@ public class CommandQueue {
         commandQueue.addLast(command);
     }
 
+    @Override
+    public String toString() {
+        return "CommandQueue{" +
+                "commandQueue=" + commandQueue.toString(", ") +
+                '}';
+    }
 }

@@ -50,6 +50,10 @@ public class Deck {
         }
     }
 
+    public boolean isEmpty() {
+        return index == -1;
+    }
+
     public void resetDeck() {
         index = cards.length - 1;
     }

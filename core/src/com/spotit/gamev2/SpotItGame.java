@@ -2,6 +2,7 @@ package com.spotit.gamev2;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -23,6 +24,7 @@ public class SpotItGame extends ApplicationAdapter {
 	Deck deck;
 	CardPair currCardPair;
 	CommandQueue commandQueue;
+	GameStateMachine gsm;
 
 	OrthographicCamera camera;
 	SpotItInputProcessor inputProcessor;
@@ -39,9 +41,10 @@ public class SpotItGame extends ApplicationAdapter {
 		deck = new Deck("SpaceIcons.atlas", 6);
 		currCardPair = null;
 		commandQueue = new CommandQueue();
+		gsm = new GameStateMachine(commandQueue, deck);
 
 		camera = new OrthographicCamera(900f, 600f);
-		inputProcessor = new SpotItInputProcessor(camera, commandQueue);
+		inputProcessor = new SpotItInputProcessor(camera, commandQueue, gsm);
 		Gdx.input.setInputProcessor(inputProcessor);
 	}
 
@@ -52,6 +55,60 @@ public class SpotItGame extends ApplicationAdapter {
 
 		update();
 
+		switch (gsm.getState()) {
+			case BEGIN:
+				drawBeginScreen();
+				break;
+			case RUN:
+				if (currCardPair != null) {
+					drawRunScreen();
+				}
+				break;
+			case END:
+				drawEndScreen();
+		}
+
+	}
+
+	@Override
+	public void dispose () {
+		shapeRenderer.dispose();
+		batch.dispose();
+		font.dispose();
+	}
+
+	private void update() {
+		if (deck.isEmpty()) {
+			commandQueue.add(new EndOfGameCommand(gsm));
+		}
+		else if (currCardPair == null) {
+			currCardPair = deck.pickCardPair();
+		}
+		else if (currCardPair.solved) {
+			currCardPair = deck.pickCardPair();
+			commandQueue.add(new ScorePointsCommand(player, 1));
+		}
+		else if (currCardPair != null) {
+			arrangeSymbolSprites(200f, 0.5f);
+		}
+
+		inputProcessor.setCurrCardPair(currCardPair);
+		commandQueue.tick();
+	}
+
+	private void drawBeginScreen() {
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		font.draw(
+				batch,
+				"Press Space to Begin",
+				camera.viewportWidth / -2f + 50f,
+				camera.viewportHeight / 2f - 50f
+		);
+		batch.end();
+	}
+
+	private void drawRunScreen() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
 		shapeRenderer.setColor(Color.ORANGE);
@@ -80,9 +137,9 @@ public class SpotItGame extends ApplicationAdapter {
 
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		font.draw(batch, String.format(
-				"Score: %d",
-				player.getScore()),
+		font.draw(
+				batch,
+				String.format("Score: %d", player.getScore()),
 				camera.viewportWidth / -2f + 50f,
 				camera.viewportHeight / 2f - 50f
 		);
@@ -90,27 +147,6 @@ public class SpotItGame extends ApplicationAdapter {
 			symbol.getSprite().draw(batch);
 		}
 		batch.end();
-	}
-
-	@Override
-	public void dispose () {
-		shapeRenderer.dispose();
-		batch.dispose();
-		font.dispose();
-	}
-
-	private void update() {
-		if (currCardPair == null) {
-			currCardPair = deck.pickCardPair();
-		}
-		else if (currCardPair.solved) {
-			currCardPair = deck.pickCardPair();
-			commandQueue.add(new ScorePointsCommand(player, 1));
-		}
-		arrangeSymbolSprites(200f, 0.5f);
-
-		inputProcessor.setCurrCardPair(currCardPair);
-		commandQueue.tick();
 	}
 
 	private void arrangeSymbolSprites(float cardRadius, float symbolSizeFactor) {
@@ -145,6 +181,24 @@ public class SpotItGame extends ApplicationAdapter {
 			);
 			angle += 360f / cardR.getSymbols().length;
 		}
+	}
+
+	private void drawEndScreen() {
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		font.draw(
+				batch,
+				String.format("Final Score: %d", player.getScore()),
+				camera.viewportWidth / -2f + 50f,
+				camera.viewportHeight / 2f - 50f
+		);
+		font.draw(
+				batch,
+				"Press Space to Play Again",
+				camera.viewportWidth / -2f + 50f,
+				camera.viewportHeight / 2f - 100f
+		);
+		batch.end();
 	}
 
 }
