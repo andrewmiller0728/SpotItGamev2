@@ -6,18 +6,22 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.spotit.gamev2.Commands.CommandQueue;
+import com.spotit.gamev2.Commands.SymbolClickedCommand;
 
 public class SpotItInputProcessor implements InputProcessor {
 
     private final OrthographicCamera camera;
     private final CommandQueue commandQueue;
     private CardPair currCardPair;
+    private GameStateMachine gsm;
 
-    public SpotItInputProcessor(OrthographicCamera camera, CommandQueue commandQueue) {
+    public SpotItInputProcessor(OrthographicCamera camera, CommandQueue commandQueue, GameStateMachine gsm) {
         super();
         this.camera = camera;
         this.commandQueue = commandQueue;
         currCardPair = null;
+        this.gsm = gsm;
     }
 
     public void setCurrCardPair(CardPair currCardPair) {
@@ -26,12 +30,15 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
-        return false;
+        System.out.printf("%s Key Down\n", Input.Keys.toString(keycode));
+        return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        return false;
+        System.out.printf("%s Key Up\n", Input.Keys.toString(keycode));
+        gsm.handleKeyInput(keycode);
+        return true;
     }
 
     @Override
