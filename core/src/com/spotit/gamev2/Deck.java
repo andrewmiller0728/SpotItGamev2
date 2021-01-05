@@ -10,34 +10,52 @@ public class Deck {
 
     /* Variables */
 
-    private TextureAtlas atlas;
-    private String setName;
-    private Card[] cards;
-    private int index; // top of deck. ex: 5 cards in deck, index = 4
+    private final TextureAtlas atlas;
+    private final String setName;
+    private final Card[] cards;
+    private int index;
+
 
     /* Constructor */
 
-    public Deck(String atlasFile, int symbolPerCard) {
+    public Deck(String atlasFile, int symbolsPerCard) {
         atlas = new TextureAtlas(atlasFile);
         setName = atlasFile.substring(0, atlasFile.indexOf("."));
-        cards = generateCards(symbolPerCard);
-        //cards = shuffleCards(cards); // TODO: Shuffle cards
+        cards = generateCards(symbolsPerCard);
         index = cards.length - 1;
     }
 
 
     /* Methods */
 
+    public CardPair pickCardPair() {
+        Card cardL = pickCard();
+        Card cardR = pickCard();
+        if (cardL != null && cardR != null) {
+            return new CardPair(cardL, cardR);
+        }
+        else {
+            return null;
+        }
+    }
+
     public Card pickCard() {
         if (index == -1) {
             return null;
         }
         else {
-            Card c = cards[index];
-            cards[index] = null;
+            Card c = cards[index];;
             index--;
             return c;
         }
+    }
+
+    public boolean isEmpty() {
+        return index == -1;
+    }
+
+    public void resetDeck() {
+        index = cards.length - 1;
     }
 
     public TextureAtlas getTextureAtlas() {
@@ -45,8 +63,8 @@ public class Deck {
     }
 
     private boolean contains(Card c) {
-        for (Card d : cards) {
-            if (d.equals(c)) {
+        for (Card card : cards) {
+            if (card.equals(c)) {
                 return true;
             }
         }
@@ -85,7 +103,7 @@ public class Deck {
 
         for (int i = 0; i <= symbolPerCard - 1; i++) {
             ArrayList<Symbol> cardSymbols = new ArrayList<>();
-            cardSymbols.add(new Symbol("(0)", atlas.createSprite("(0)")));
+            cardSymbols.add(new Symbol("(1)", atlas.createSprite("(1)")));
             for (int j = 1; j <= symbolPerCard - 1; j++) {
                 int curr = (symbolPerCard - 1) + (symbolPerCard - 1) * (i - 1) + (j + 1);
                 cardSymbols.add(new Symbol("(" + curr + ")", atlas.createSprite("(" + curr + ")")));
@@ -105,7 +123,7 @@ public class Deck {
             }
         }
 
-        return deck.toArray(new Card[0]);
+        return shuffleCards(deck.toArray(new Card[0]));
     }
 
     private boolean isPrime(int n) {

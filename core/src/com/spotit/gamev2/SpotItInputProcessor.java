@@ -6,30 +6,39 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.spotit.gamev2.Commands.CommandQueue;
+import com.spotit.gamev2.Commands.SymbolClickedCommand;
 
 public class SpotItInputProcessor implements InputProcessor {
 
     private final OrthographicCamera camera;
-    private final GameMaster gm;
-    private SymbolSprite[][] currSymbolSprites;
-    private boolean isGuessCorrect;
+    private final CommandQueue commandQueue;
+    private CardPair currCardPair;
+    private GameStateMachine gsm;
 
-    public SpotItInputProcessor(OrthographicCamera currCam, GameMaster gm) {
+    public SpotItInputProcessor(OrthographicCamera camera, CommandQueue commandQueue, GameStateMachine gsm) {
         super();
-        camera = currCam;
-        this.gm = gm;
-        currSymbolSprites = gm.getCurrSymbolSprites();
-        isGuessCorrect = false;
+        this.camera = camera;
+        this.commandQueue = commandQueue;
+        currCardPair = null;
+        this.gsm = gsm;
+    }
+
+    public void setCurrCardPair(CardPair currCardPair) {
+        this.currCardPair = currCardPair;
     }
 
     @Override
     public boolean keyDown(int keycode) {
-        return false;
+        System.out.printf("%s Key Down\n", Input.Keys.toString(keycode));
+        return true;
     }
 
     @Override
     public boolean keyUp(int keycode) {
-        return false;
+        System.out.printf("%s Key Up\n", Input.Keys.toString(keycode));
+        gsm.handleKeyInput(keycode);
+        return true;
     }
 
     @Override
@@ -39,43 +48,54 @@ public class SpotItInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (button == Input.Buttons.LEFT && pointer == 0) {
-            Vector2 cursor = new Vector2(
-                    MathUtils.map(
-                            0,
-                            Gdx.graphics.getWidth(),
-                            camera.viewportWidth / -2f,
-                            camera.viewportWidth / 2f,
-                            screenX
-                    ),
-                    MathUtils.map(
-                            0,
-                            Gdx.graphics.getHeight(),
-                            camera.viewportHeight / 2f,
-                            camera.viewportHeight / -2f,
-                            screenY
-                    )
-            );
-            currSymbolSprites = gm.getCurrSymbolSprites();
-            for (SymbolSprite[] currSymbolSpriteRow : currSymbolSprites) {
-                for (SymbolSprite symbolSprite : currSymbolSpriteRow) {
-                    if (symbolSprite.getSprite().getBoundingRectangle().contains(cursor)) {
-                        isGuessCorrect = gm.makeGuess(symbolSprite.getSymbol());
-                        return true;
-                    }
-                }
-            }
-            return true;
-        }
+        Vector2 cursor = new Vector2(
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getWidth(),
+                        camera.viewportWidth / -2f,
+                        camera.viewportWidth / 2f,
+                        screenX
+                ),
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getHeight(),
+                        camera.viewportHeight / 2f,
+                        camera.viewportHeight / -2f,
+                        screenY
+                )
+        );
+        System.out.printf("touch down at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        if (isGuessCorrect) {
-            gm.updateCardPair();
+        Vector2 cursor = new Vector2(
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getWidth(),
+                        camera.viewportWidth / -2f,
+                        camera.viewportWidth / 2f,
+                        screenX
+                ),
+                MathUtils.map(
+                        0,
+                        Gdx.graphics.getHeight(),
+                        camera.viewportHeight / 2f,
+                        camera.viewportHeight / -2f,
+                        screenY
+                )
+        );
+        System.out.printf("touch up at (x:%.2f, y:%.2f)\n", cursor.x, cursor.y);
+
+        if (button == Input.Buttons.LEFT && pointer == 0 && currCardPair != null) {
+            for (Symbol symbol : currCardPair.getSymbols()) {
+                if (symbol.getSprite().getBoundingRectangle().contains(cursor)) {
+                    commandQueue.add(new SymbolClickedCommand(symbol, currCardPair));
+                    return true;
+                }
+            }
         }
-        isGuessCorrect = false;
 
         return false;
     }
