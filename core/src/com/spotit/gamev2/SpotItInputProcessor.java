@@ -6,6 +6,8 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.spotit.gamev2.Commands.CommandQueue;
+import com.spotit.gamev2.Commands.SymbolClickedCommand;
 
 public class SpotItInputProcessor implements InputProcessor {
 

@@ -1,6 +1,9 @@
 package com.spotit.gamev2;
 
 import com.badlogic.gdx.Input.Keys;
+import com.spotit.gamev2.Commands.CommandQueue;
+import com.spotit.gamev2.Commands.ResetGameCommand;
+import com.spotit.gamev2.Commands.RunGameCommand;
 
 public class GameStateMachine {
 
@@ -9,7 +12,7 @@ public class GameStateMachine {
     }
 
     private GameStates gameState;
-    private CommandQueue commandQueue;
+    private final CommandQueue commandQueue;
     private final Deck deck;
 
     public GameStateMachine(CommandQueue commandQueue, Deck deck) {

@@ -1,4 +1,4 @@
-package com.spotit.gamev2;
+package com.spotit.gamev2.Commands;
 
 import com.badlogic.gdx.utils.Queue;
 

@@ -1,4 +1,7 @@
-package com.spotit.gamev2;
+package com.spotit.gamev2.Commands;
+
+import com.spotit.gamev2.CardPair;
+import com.spotit.gamev2.Symbol;
 
 public class SymbolClickedCommand extends Command {
 

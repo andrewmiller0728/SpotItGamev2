@@ -1,4 +1,7 @@
-package com.spotit.gamev2;
+package com.spotit.gamev2.Commands;
+
+import com.spotit.gamev2.Deck;
+import com.spotit.gamev2.GameStateMachine;
 
 public class ResetGameCommand extends Command {
 

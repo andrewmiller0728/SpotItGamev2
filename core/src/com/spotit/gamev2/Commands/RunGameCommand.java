@@ -1,4 +1,6 @@
-package com.spotit.gamev2;
+package com.spotit.gamev2.Commands;
+
+import com.spotit.gamev2.GameStateMachine;
 
 public class RunGameCommand extends Command {
 

@@ -1,4 +1,6 @@
-package com.spotit.gamev2;
+package com.spotit.gamev2.Commands;
+
+import com.spotit.gamev2.Player;
 
 public class ScorePointsCommand extends Command {
 
